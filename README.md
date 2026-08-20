@@ -1,6 +1,13 @@
 # Situational Awareness BOF
 This repo intends to serve two purposes.  First it provides a nice set of basic situational awareness commands implemented in a Beacon Object File (BOF).  This allows you to perform some checks on a host before you begin executing commands that may be more invasive.
 
+## Reflektor cross-platform matrix
+
+The `bofs` branch retains the complete upstream Windows source set and adds a
+25-command Linux/Darwin suite for Reflektor. See
+[`PORTABILITY.md`](PORTABILITY.md) for provenance, build instructions, the
+eight supported OS/architecture targets, and deliberate portability limits.
+
 Its larger goal is providing a code example and workflow for others to begin making more BOFs. It is a companion document of the blog post made here: https://www.trustedsec.com/blog/a-developers-introduction-to-beacon-object-files/
 
 ## Making a new BOF

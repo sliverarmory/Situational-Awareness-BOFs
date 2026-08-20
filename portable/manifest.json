@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "entrypoint": "go",
+  "artifact_template": "dist/{goos}/{goarch}/{command}.o",
+  "targets": [
+    {"goos": "windows", "goarch": "386", "format": "coff", "machine": "i386", "commands": "all-upstream"},
+    {"goos": "windows", "goarch": "amd64", "format": "coff", "machine": "amd64", "commands": "all-upstream"},
+    {"goos": "windows", "goarch": "arm64", "format": "coff", "machine": "arm64", "commands": "all-upstream"},
+    {"goos": "linux", "goarch": "386", "format": "elf-rel", "machine": "i386", "commands": "portable"},
+    {"goos": "linux", "goarch": "amd64", "format": "elf-rel", "machine": "amd64", "commands": "portable"},
+    {"goos": "linux", "goarch": "arm64", "format": "elf-rel", "machine": "arm64", "commands": "portable"},
+    {"goos": "darwin", "goarch": "amd64", "format": "elf-rel", "machine": "amd64", "commands": "portable"},
+    {"goos": "darwin", "goarch": "arm64", "format": "elf-rel", "machine": "arm64", "commands": "portable"}
+  ],
+  "command_sets": {
+    "portable": [
+      "arp", "cacls", "dir", "enumLocalSessions", "env", "findLoadedModule",
+      "ipconfig", "listmods", "locale", "md5", "netlocalgroup", "netloggedon",
+      "netloggedon2", "netstat", "netuser", "netuserenum", "nslookup", "probe",
+      "resources", "routeprint", "sha1", "sha256", "tasklist", "uptime", "whoami"
+    ],
+    "all-upstream": {"source_directories": "src/SA/*", "expected_count": 64},
+    "windows-only": [
+      "aadjoininfo", "adcs_enum", "adcs_enum_com", "adcs_enum_com2",
+      "adv_audit_policies", "driversigs", "enum_filter_driver", "get-netsession",
+      "get-netsession2", "get_dpapi_system", "get_password_policy",
+      "get_session_info", "ldapsearch", "ldapsecuritycheck",
+      "list_firewall_rules", "listdns", "netgroup", "netlocalgroup2",
+      "netshares", "nettime", "netuptime", "netuse", "netview",
+      "nonpagedldapsearch", "notepad",
+      "reg_query", "regsession",
+      "sc_enum", "sc_qc", "sc_qdescription", "sc_qfailure",
+      "sc_qtriggerinfo", "sc_query", "schtasksenum", "schtasksquery",
+      "useridletime", "vssenum", "windowlist", "wmi_query"
+    ]
+  },
+  "windows_only_reason": "Requires a Windows-specific subsystem or ABI; retained and tested on Windows instead of presenting a partial Unix port.",
+  "e2e_manifest": "testdata/e2e-manifest.json"
+}
