@@ -4,10 +4,11 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
+# Native Windows jq.exe emits CRLF under Git Bash; normalize JSON-derived lines.
 portable_commands=()
 while IFS= read -r command; do
     portable_commands+=("$command")
-done < <(jq -er '.command_sets.portable[]' portable/manifest.json)
+done < <(jq -er '.command_sets.portable[]' portable/manifest.json | tr -d '\r')
 windows_commands=()
 while IFS= read -r command; do
     windows_commands+=("$command")
@@ -86,13 +87,15 @@ if ! diff -u \
     exit 1
 fi
 
-if ! diff -u testdata/e2e-manifest.json <(node scripts/generate-e2e-manifest.mjs); then
+if ! diff -u \
+    <(tr -d '\r' < testdata/e2e-manifest.json) \
+    <(node scripts/generate-e2e-manifest.mjs | tr -d '\r'); then
     echo "e2e manifest is stale; regenerate it with scripts/generate-e2e-manifest.mjs --write" >&2
     exit 1
 fi
 if ! diff -u \
     <(find src/SA -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | LC_ALL=C sort) \
-    <(jq -r '.command_sets.portable[], .command_sets["windows-only"][]' portable/manifest.json | LC_ALL=C sort -u); then
+    <(jq -r '.command_sets.portable[], .command_sets["windows-only"][]' portable/manifest.json | tr -d '\r' | LC_ALL=C sort -u); then
     echo "portable manifest does not classify every retained upstream command" >&2
     exit 1
 fi

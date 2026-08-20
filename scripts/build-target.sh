@@ -36,10 +36,11 @@ export ZIG_GLOBAL_CACHE_DIR="${ZIG_GLOBAL_CACHE_DIR:-$cache_root/global}"
 export ZIG_LOCAL_CACHE_DIR="${ZIG_LOCAL_CACHE_DIR:-$cache_root/local}"
 mkdir -p "$ZIG_GLOBAL_CACHE_DIR" "$ZIG_LOCAL_CACHE_DIR" "dist/$goos/$goarch"
 
+# Native Windows jq.exe emits CRLF under Git Bash; normalize JSON-derived lines.
 portable_commands=()
 while IFS= read -r command; do
     portable_commands+=("$command")
-done < <(jq -er '.command_sets.portable[]' portable/manifest.json)
+done < <(jq -er '.command_sets.portable[]' portable/manifest.json | tr -d '\r')
 windows_commands=()
 while IFS= read -r command; do
     windows_commands+=("$command")
@@ -148,7 +149,7 @@ if ! diff -u \
 fi
 if ! diff -u \
     <(for command in "${commands[@]}"; do printf "dist/%s/%s/%s.o\n" "$goos" "$goarch" "$command"; done | LC_ALL=C sort) \
-    <(jq -r --arg os "$goos" --arg arch "$goarch" '.artifacts[] | select(.os == $os and .arch == $arch) | .path' testdata/e2e-manifest.json | LC_ALL=C sort); then
+    <(jq -r --arg os "$goos" --arg arch "$goarch" '.artifacts[] | select(.os == $os and .arch == $arch) | .path' testdata/e2e-manifest.json | tr -d '\r' | LC_ALL=C sort); then
     echo "error: e2e manifest does not exactly cover $goos/$goarch" >&2
     exit 1
 fi
