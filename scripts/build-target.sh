@@ -11,11 +11,12 @@ fi
 goos="$1"
 goarch="$2"
 target_cflag=
+object_machine=
 
 case "$goos/$goarch" in
-    windows/386) zig_target=x86-windows-gnu; object_pattern="80386 COFF" ;;
-    windows/amd64) zig_target=x86_64-windows-gnu; object_pattern="amd64 COFF" ;;
-    windows/arm64) zig_target=aarch64-windows-gnu; object_pattern="Aarch64 COFF" ;;
+    windows/386) zig_target=x86-windows-gnu; object_pattern="COFF"; object_machine=4c01 ;;
+    windows/amd64) zig_target=x86_64-windows-gnu; object_pattern="COFF"; object_machine=6486 ;;
+    windows/arm64) zig_target=aarch64-windows-gnu; object_pattern="COFF"; object_machine=64aa ;;
     linux/386) zig_target=x86-linux-none; platform_define=BOF_LINUX; object_pattern="ELF 32-bit LSB relocatable, Intel 80386" ;;
     linux/amd64) zig_target=x86_64-linux-none; platform_define=BOF_LINUX; object_pattern="ELF 64-bit LSB relocatable, x86-64" ;;
     linux/arm64) zig_target=aarch64-linux-none; platform_define=BOF_LINUX; object_pattern="ELF 64-bit LSB relocatable, ARM aarch64" ;;
@@ -110,6 +111,13 @@ for command in "${commands[@]}"; do
     if [[ "$description" != *"$object_pattern"* ]]; then
         echo "wrong format: $artifact: $description" >&2
         exit 1
+    fi
+    if [[ -n "$object_machine" ]]; then
+        actual_machine="$(od -An -tx1 -N2 "$artifact" | tr -d '[:space:]')"
+        if [[ "$actual_machine" != "$object_machine" ]]; then
+            echo "wrong COFF machine: $artifact: got $actual_machine, want $object_machine" >&2
+            exit 1
+        fi
     fi
 done
 

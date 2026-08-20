@@ -19,6 +19,7 @@ failures=0
 verify_artifact() {
     local target="$1"
     local command="$2"
+    local expected_machine=
     goos="${target%/*}"
     goarch="${target#*/}"
     artifact="dist/$target/$command.o"
@@ -29,9 +30,9 @@ verify_artifact() {
     fi
     description="$(file -b "$artifact")"
     case "$goos/$goarch" in
-        windows/386) expected="80386 COFF" ;;
-        windows/amd64) expected="amd64 COFF" ;;
-        windows/arm64) expected="Aarch64 COFF" ;;
+        windows/386) expected="COFF"; expected_machine=4c01 ;;
+        windows/amd64) expected="COFF"; expected_machine=6486 ;;
+        windows/arm64) expected="COFF"; expected_machine=64aa ;;
         linux/386) expected="ELF 32-bit LSB relocatable, Intel 80386" ;;
         linux/amd64|darwin/amd64) expected="ELF 64-bit LSB relocatable, x86-64" ;;
         linux/arm64|darwin/arm64) expected="ELF 64-bit LSB relocatable, ARM aarch64" ;;
@@ -39,6 +40,13 @@ verify_artifact() {
     if [[ "$description" != *"$expected"* ]]; then
         echo "wrong format: $artifact: $description" >&2
         failures=$((failures + 1))
+    fi
+    if [[ -n "$expected_machine" ]]; then
+        actual_machine="$(od -An -tx1 -N2 "$artifact" | tr -d '[:space:]')"
+        if [[ "$actual_machine" != "$expected_machine" ]]; then
+            echo "wrong COFF machine: $artifact: got $actual_machine, want $expected_machine" >&2
+            failures=$((failures + 1))
+        fi
     fi
 }
 
