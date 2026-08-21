@@ -23,15 +23,16 @@ and arm64. The portable Unix set is `arp`, `cacls`, `dir`,
 (Active Directory, COM, DPAPI, Registry, SCM, scheduled tasks, WMI, and similar
 APIs) remain present and tested on Windows but are not mislabeled as portable.
 
-Linux objects are native ELF `ET_REL` objects. Darwin objects also use an ELF
-relocatable container, compiled without Linux headers or a Linux libc; the
-machine code uses the shared SysV AMD64 or AAPCS64 calling convention and
-imports only Darwin ABI symbols selected by `BOF_DARWIN`. This is an explicit
-Reflektor interchange format, not a claim that macOS natively links ELF files.
-Darwin/arm64 builds enable Zig's `reserve_x18` target feature so Linux-targeted
-code generation never uses Apple's reserved platform register. Portable Darwin BOFs also use the
-non-variadic `BeaconOutput` callback, avoiding the Apple/Linux variadic ABI
-difference.
+Linux objects are native ELF `ET_REL` objects. Darwin objects are native thin
+Mach-O `MH_OBJECT` files produced with Zig's `x86_64-macos-none` and
+`aarch64-macos-none` targets. They are compiled without SDK headers and import
+only Darwin ABI symbols selected by `BOF_DARWIN`. A Mach-O `MH_OBJECT` is a
+relocatable loader input, not a dylib that can be passed to `dlopen`.
+The native Darwin/arm64 target follows Apple's reserved x18 platform-register
+rule, and the build verifies the generated disassembly. Portable Darwin BOFs
+also use the non-variadic `BeaconOutput` callback, avoiding the Apple/Linux
+variadic ABI difference; native Darwin/arm64 BOFs must not import
+`BeaconPrintf` or `BeaconFormatPrintf`.
 
 The Unix implementation is freestanding: it does not include host SDK headers
 and keeps hashing code inside each object. Its external surface is limited to
@@ -106,5 +107,5 @@ Windows account-state modes are rejected explicitly instead of being ignored.
   available. Darwin uses the platform `netstat`, `vm_stat`, `df`, and `ps`
   utilities at fixed system paths. The Darwin `netstat` port reports all socket
   families and includes the requested Windows-compatible filter value.
-- Darwin ELF objects are for Reflektor's loader only; system linkers and
-  `dlopen` do not consume them.
+- Darwin Mach-O objects are relocatable `MH_OBJECT` inputs for Reflektor;
+  `dlopen` consumes linked images instead.

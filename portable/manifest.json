@@ -9,8 +9,8 @@
     {"goos": "linux", "goarch": "386", "format": "elf-rel", "machine": "i386", "commands": "portable"},
     {"goos": "linux", "goarch": "amd64", "format": "elf-rel", "machine": "amd64", "commands": "portable"},
     {"goos": "linux", "goarch": "arm64", "format": "elf-rel", "machine": "arm64", "commands": "portable"},
-    {"goos": "darwin", "goarch": "amd64", "format": "elf-rel", "machine": "amd64", "commands": "portable"},
-    {"goos": "darwin", "goarch": "arm64", "format": "elf-rel", "machine": "arm64", "commands": "portable"}
+    {"goos": "darwin", "goarch": "amd64", "format": "macho-rel", "machine": "amd64", "commands": "portable"},
+    {"goos": "darwin", "goarch": "arm64", "format": "macho-rel", "machine": "arm64", "commands": "portable"}
   ],
   "command_sets": {
     "portable": [

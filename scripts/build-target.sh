@@ -10,8 +10,8 @@ if [[ "$#" -ne 2 ]]; then
 fi
 goos="$1"
 goarch="$2"
-target_cflag=
 object_machine=
+macho_cpu=
 
 case "$goos/$goarch" in
     windows/386) zig_target=x86-windows-gnu; object_pattern="COFF"; object_machine=4c01 ;;
@@ -20,8 +20,8 @@ case "$goos/$goarch" in
     linux/386) zig_target=x86-linux-none; platform_define=BOF_LINUX; object_pattern="ELF 32-bit LSB relocatable, Intel 80386" ;;
     linux/amd64) zig_target=x86_64-linux-none; platform_define=BOF_LINUX; object_pattern="ELF 64-bit LSB relocatable, x86-64" ;;
     linux/arm64) zig_target=aarch64-linux-none; platform_define=BOF_LINUX; object_pattern="ELF 64-bit LSB relocatable, ARM aarch64" ;;
-    darwin/amd64) zig_target=x86_64-linux-none; platform_define=BOF_DARWIN; object_pattern="ELF 64-bit LSB relocatable, x86-64" ;;
-    darwin/arm64) zig_target=aarch64-linux-none; platform_define=BOF_DARWIN; object_pattern="ELF 64-bit LSB relocatable, ARM aarch64"; target_cflag=-mcpu=baseline+reserve_x18 ;;
+    darwin/amd64) zig_target=x86_64-macos-none; platform_define=BOF_DARWIN; object_pattern="Mach-O"; macho_cpu=07000001 ;;
+    darwin/arm64) zig_target=aarch64-macos-none; platform_define=BOF_DARWIN; object_pattern="Mach-O"; macho_cpu=0c000001 ;;
     *) echo "error: unsupported target $goos/$goarch" >&2; exit 2 ;;
 esac
 
@@ -97,7 +97,6 @@ else
         read -r define source_file <<<"$(command_configuration "$command")"
         echo "CC  $goos/$goarch $command"
         "$zig_bin" cc -target "$zig_target" -std=c11 -Os \
-            ${target_cflag:+"$target_cflag"} \
             -ffreestanding -fno-builtin -fno-stack-protector -fPIC \
             -fno-unwind-tables -fno-asynchronous-unwind-tables \
             -Werror=implicit-function-declaration -Wno-unused-function \
@@ -117,6 +116,24 @@ for command in "${commands[@]}"; do
         actual_machine="$(od -An -tx1 -N2 "$artifact" | tr -d '[:space:]')"
         if [[ "$actual_machine" != "$object_machine" ]]; then
             echo "wrong COFF machine: $artifact: got $actual_machine, want $object_machine" >&2
+            exit 1
+        fi
+    fi
+    if [[ -n "$macho_cpu" ]]; then
+        macho_header="$(od -An -tx1 -N16 "$artifact" | tr -d '[:space:]')"
+        actual_magic="${macho_header:0:8}"
+        actual_cpu="${macho_header:8:8}"
+        actual_type="${macho_header:24:8}"
+        if [[ "$actual_magic" != cffaedfe ]]; then
+            echo "wrong Mach-O magic: $artifact: got $actual_magic, want cffaedfe" >&2
+            exit 1
+        fi
+        if [[ "$actual_cpu" != "$macho_cpu" ]]; then
+            echo "wrong Mach-O CPU: $artifact: got $actual_cpu, want $macho_cpu" >&2
+            exit 1
+        fi
+        if [[ "$actual_type" != 01000000 ]]; then
+            echo "wrong Mach-O file type: $artifact: got $actual_type, want MH_OBJECT (01000000)" >&2
             exit 1
         fi
     fi

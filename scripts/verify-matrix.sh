@@ -20,10 +20,13 @@ failures=0
 verify_artifact() {
     local target="$1"
     local command="$2"
+    local goos="${target%/*}"
+    local goarch="${target#*/}"
+    local artifact="dist/$target/$command.o"
+    local description
+    local expected=
     local expected_machine=
-    goos="${target%/*}"
-    goarch="${target#*/}"
-    artifact="dist/$target/$command.o"
+    local expected_macho_cpu=
     if [[ ! -s "$artifact" ]]; then
         echo "missing: $artifact" >&2
         failures=$((failures + 1))
@@ -35,8 +38,10 @@ verify_artifact() {
         windows/amd64) expected="COFF"; expected_machine=6486 ;;
         windows/arm64) expected="COFF"; expected_machine=64aa ;;
         linux/386) expected="ELF 32-bit LSB relocatable, Intel 80386" ;;
-        linux/amd64|darwin/amd64) expected="ELF 64-bit LSB relocatable, x86-64" ;;
-        linux/arm64|darwin/arm64) expected="ELF 64-bit LSB relocatable, ARM aarch64" ;;
+        linux/amd64) expected="ELF 64-bit LSB relocatable, x86-64" ;;
+        linux/arm64) expected="ELF 64-bit LSB relocatable, ARM aarch64" ;;
+        darwin/amd64) expected="Mach-O"; expected_macho_cpu=07000001 ;;
+        darwin/arm64) expected="Mach-O"; expected_macho_cpu=0c000001 ;;
     esac
     if [[ "$description" != *"$expected"* ]]; then
         echo "wrong format: $artifact: $description" >&2
@@ -46,6 +51,28 @@ verify_artifact() {
         actual_machine="$(od -An -tx1 -N2 "$artifact" | tr -d '[:space:]')"
         if [[ "$actual_machine" != "$expected_machine" ]]; then
             echo "wrong COFF machine: $artifact: got $actual_machine, want $expected_machine" >&2
+            failures=$((failures + 1))
+        fi
+    fi
+    if [[ -n "$expected_macho_cpu" ]]; then
+        local macho_header
+        local actual_magic
+        local actual_cpu
+        local actual_type
+        macho_header="$(od -An -tx1 -N16 "$artifact" | tr -d '[:space:]')"
+        actual_magic="${macho_header:0:8}"
+        actual_cpu="${macho_header:8:8}"
+        actual_type="${macho_header:24:8}"
+        if [[ "$actual_magic" != cffaedfe ]]; then
+            echo "wrong Mach-O magic: $artifact: got $actual_magic, want cffaedfe" >&2
+            failures=$((failures + 1))
+        fi
+        if [[ "$actual_cpu" != "$expected_macho_cpu" ]]; then
+            echo "wrong Mach-O CPU: $artifact: got $actual_cpu, want $expected_macho_cpu" >&2
+            failures=$((failures + 1))
+        fi
+        if [[ "$actual_type" != 01000000 ]]; then
+            echo "wrong Mach-O file type: $artifact: got $actual_type, want MH_OBJECT (01000000)" >&2
             failures=$((failures + 1))
         fi
     fi
