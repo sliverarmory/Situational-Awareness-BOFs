@@ -1,0 +1,638 @@
+{
+  "schema": "sliver-bof-e2e/v1",
+  "sliver": {
+    "version": "b19e383111dbf8b04096806b249f6238274edff4"
+  },
+  "defaults": {
+    "bof_executor": "reflektor",
+    "entrypoint": "go",
+    "modes": [
+      "session",
+      "beacon"
+    ],
+    "repeat": 1,
+    "command_timeout": "2m"
+  },
+  "fixtures": {
+    "file": {
+      "variable": "FIXTURE_FILE",
+      "contents_utf8": "reflektor-bof-e2e\n"
+    },
+    "directory": {
+      "variable": "FIXTURE_DIR",
+      "files": {
+        "marker.txt": "reflektor-bof-e2e\n"
+      }
+    }
+  },
+  "suites": [
+    {
+      "name": "windows-386",
+      "target": {
+        "os": "windows",
+        "arch": "386"
+      },
+      "tests": [
+        {
+          "name": "dir",
+          "object": "dist/windows/386/dir.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_DIR}"
+            },
+            {
+              "type": "short",
+              "value": 0
+            }
+          ],
+          "expect": {
+            "output": {
+              "contains": [
+                "Contents of",
+                "marker.txt"
+              ]
+            }
+          }
+        },
+        {
+          "name": "md5",
+          "object": "dist/windows/386/md5.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_FILE}"
+            }
+          ],
+          "expect": {
+            "output": {
+              "matches": [
+                "(?i:b9b3a37829baa40ee941e901aab8671b)"
+              ]
+            }
+          }
+        },
+        {
+          "name": "sha256",
+          "object": "dist/windows/386/sha256.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_FILE}"
+            }
+          ],
+          "expect": {
+            "output": {
+              "matches": [
+                "(?i:74ccef2214ea8b89387bf7363ab01a4caccbb502417c0af7e42a578d67f1c9cb)"
+              ]
+            }
+          }
+        },
+        {
+          "name": "uptime",
+          "object": "dist/windows/386/uptime.o",
+          "expect": {
+            "output": {
+              "contains": [
+                "Uptime:"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "windows-amd64",
+      "target": {
+        "os": "windows",
+        "arch": "amd64"
+      },
+      "tests": [
+        {
+          "name": "dir",
+          "object": "dist/windows/amd64/dir.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_DIR}"
+            },
+            {
+              "type": "short",
+              "value": 0
+            }
+          ],
+          "expect": {
+            "output": {
+              "contains": [
+                "Contents of",
+                "marker.txt"
+              ]
+            }
+          }
+        },
+        {
+          "name": "md5",
+          "object": "dist/windows/amd64/md5.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_FILE}"
+            }
+          ],
+          "expect": {
+            "output": {
+              "matches": [
+                "(?i:b9b3a37829baa40ee941e901aab8671b)"
+              ]
+            }
+          }
+        },
+        {
+          "name": "sha256",
+          "object": "dist/windows/amd64/sha256.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_FILE}"
+            }
+          ],
+          "expect": {
+            "output": {
+              "matches": [
+                "(?i:74ccef2214ea8b89387bf7363ab01a4caccbb502417c0af7e42a578d67f1c9cb)"
+              ]
+            }
+          }
+        },
+        {
+          "name": "uptime",
+          "object": "dist/windows/amd64/uptime.o",
+          "expect": {
+            "output": {
+              "contains": [
+                "Uptime:"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "windows-arm64",
+      "target": {
+        "os": "windows",
+        "arch": "arm64"
+      },
+      "tests": [
+        {
+          "name": "dir",
+          "object": "dist/windows/arm64/dir.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_DIR}"
+            },
+            {
+              "type": "short",
+              "value": 0
+            }
+          ],
+          "expect": {
+            "output": {
+              "contains": [
+                "Contents of",
+                "marker.txt"
+              ]
+            }
+          }
+        },
+        {
+          "name": "md5",
+          "object": "dist/windows/arm64/md5.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_FILE}"
+            }
+          ],
+          "expect": {
+            "output": {
+              "matches": [
+                "(?i:b9b3a37829baa40ee941e901aab8671b)"
+              ]
+            }
+          }
+        },
+        {
+          "name": "sha256",
+          "object": "dist/windows/arm64/sha256.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_FILE}"
+            }
+          ],
+          "expect": {
+            "output": {
+              "matches": [
+                "(?i:74ccef2214ea8b89387bf7363ab01a4caccbb502417c0af7e42a578d67f1c9cb)"
+              ]
+            }
+          }
+        },
+        {
+          "name": "uptime",
+          "object": "dist/windows/arm64/uptime.o",
+          "expect": {
+            "output": {
+              "contains": [
+                "Uptime:"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "linux-386",
+      "target": {
+        "os": "linux",
+        "arch": "386"
+      },
+      "tests": [
+        {
+          "name": "dir",
+          "object": "dist/linux/386/dir.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_DIR}"
+            },
+            {
+              "type": "short",
+              "value": 0
+            }
+          ],
+          "expect": {
+            "output": {
+              "contains": [
+                "Contents of",
+                "marker.txt"
+              ]
+            }
+          }
+        },
+        {
+          "name": "md5",
+          "object": "dist/linux/386/md5.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_FILE}"
+            }
+          ],
+          "expect": {
+            "output": {
+              "matches": [
+                "(?i:b9b3a37829baa40ee941e901aab8671b)"
+              ]
+            }
+          }
+        },
+        {
+          "name": "sha256",
+          "object": "dist/linux/386/sha256.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_FILE}"
+            }
+          ],
+          "expect": {
+            "output": {
+              "matches": [
+                "(?i:74ccef2214ea8b89387bf7363ab01a4caccbb502417c0af7e42a578d67f1c9cb)"
+              ]
+            }
+          }
+        },
+        {
+          "name": "uptime",
+          "object": "dist/linux/386/uptime.o",
+          "expect": {
+            "output": {
+              "contains": [
+                "uptime_seconds="
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "linux-amd64",
+      "target": {
+        "os": "linux",
+        "arch": "amd64"
+      },
+      "tests": [
+        {
+          "name": "dir",
+          "object": "dist/linux/amd64/dir.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_DIR}"
+            },
+            {
+              "type": "short",
+              "value": 0
+            }
+          ],
+          "expect": {
+            "output": {
+              "contains": [
+                "Contents of",
+                "marker.txt"
+              ]
+            }
+          }
+        },
+        {
+          "name": "md5",
+          "object": "dist/linux/amd64/md5.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_FILE}"
+            }
+          ],
+          "expect": {
+            "output": {
+              "matches": [
+                "(?i:b9b3a37829baa40ee941e901aab8671b)"
+              ]
+            }
+          }
+        },
+        {
+          "name": "sha256",
+          "object": "dist/linux/amd64/sha256.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_FILE}"
+            }
+          ],
+          "expect": {
+            "output": {
+              "matches": [
+                "(?i:74ccef2214ea8b89387bf7363ab01a4caccbb502417c0af7e42a578d67f1c9cb)"
+              ]
+            }
+          }
+        },
+        {
+          "name": "uptime",
+          "object": "dist/linux/amd64/uptime.o",
+          "expect": {
+            "output": {
+              "contains": [
+                "uptime_seconds="
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "linux-arm64",
+      "target": {
+        "os": "linux",
+        "arch": "arm64"
+      },
+      "tests": [
+        {
+          "name": "dir",
+          "object": "dist/linux/arm64/dir.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_DIR}"
+            },
+            {
+              "type": "short",
+              "value": 0
+            }
+          ],
+          "expect": {
+            "output": {
+              "contains": [
+                "Contents of",
+                "marker.txt"
+              ]
+            }
+          }
+        },
+        {
+          "name": "md5",
+          "object": "dist/linux/arm64/md5.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_FILE}"
+            }
+          ],
+          "expect": {
+            "output": {
+              "matches": [
+                "(?i:b9b3a37829baa40ee941e901aab8671b)"
+              ]
+            }
+          }
+        },
+        {
+          "name": "sha256",
+          "object": "dist/linux/arm64/sha256.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_FILE}"
+            }
+          ],
+          "expect": {
+            "output": {
+              "matches": [
+                "(?i:74ccef2214ea8b89387bf7363ab01a4caccbb502417c0af7e42a578d67f1c9cb)"
+              ]
+            }
+          }
+        },
+        {
+          "name": "uptime",
+          "object": "dist/linux/arm64/uptime.o",
+          "expect": {
+            "output": {
+              "contains": [
+                "uptime_seconds="
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "darwin-amd64",
+      "target": {
+        "os": "darwin",
+        "arch": "amd64"
+      },
+      "tests": [
+        {
+          "name": "dir",
+          "object": "dist/darwin/amd64/dir.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_DIR}"
+            },
+            {
+              "type": "short",
+              "value": 0
+            }
+          ],
+          "expect": {
+            "output": {
+              "contains": [
+                "Contents of",
+                "marker.txt"
+              ]
+            }
+          }
+        },
+        {
+          "name": "md5",
+          "object": "dist/darwin/amd64/md5.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_FILE}"
+            }
+          ],
+          "expect": {
+            "output": {
+              "matches": [
+                "(?i:b9b3a37829baa40ee941e901aab8671b)"
+              ]
+            }
+          }
+        },
+        {
+          "name": "sha256",
+          "object": "dist/darwin/amd64/sha256.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_FILE}"
+            }
+          ],
+          "expect": {
+            "output": {
+              "matches": [
+                "(?i:74ccef2214ea8b89387bf7363ab01a4caccbb502417c0af7e42a578d67f1c9cb)"
+              ]
+            }
+          }
+        },
+        {
+          "name": "uptime",
+          "object": "dist/darwin/amd64/uptime.o",
+          "expect": {
+            "output": {
+              "contains": [
+                "uptime_seconds="
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "darwin-arm64",
+      "target": {
+        "os": "darwin",
+        "arch": "arm64"
+      },
+      "tests": [
+        {
+          "name": "dir",
+          "object": "dist/darwin/arm64/dir.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_DIR}"
+            },
+            {
+              "type": "short",
+              "value": 0
+            }
+          ],
+          "expect": {
+            "output": {
+              "contains": [
+                "Contents of",
+                "marker.txt"
+              ]
+            }
+          }
+        },
+        {
+          "name": "md5",
+          "object": "dist/darwin/arm64/md5.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_FILE}"
+            }
+          ],
+          "expect": {
+            "output": {
+              "matches": [
+                "(?i:b9b3a37829baa40ee941e901aab8671b)"
+              ]
+            }
+          }
+        },
+        {
+          "name": "sha256",
+          "object": "dist/darwin/arm64/sha256.o",
+          "args": [
+            {
+              "type": "string",
+              "value": "${FIXTURE_FILE}"
+            }
+          ],
+          "expect": {
+            "output": {
+              "matches": [
+                "(?i:74ccef2214ea8b89387bf7363ab01a4caccbb502417c0af7e42a578d67f1c9cb)"
+              ]
+            }
+          }
+        },
+        {
+          "name": "uptime",
+          "object": "dist/darwin/arm64/uptime.o",
+          "expect": {
+            "output": {
+              "contains": [
+                "uptime_seconds="
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

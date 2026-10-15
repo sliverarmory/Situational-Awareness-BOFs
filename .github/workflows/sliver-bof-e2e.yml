@@ -1,0 +1,47 @@
+name: Sliver BOF End-to-End
+
+on:
+  push:
+    branches: [bofs]
+    paths:
+      - .github/sliver-bof-e2e.json
+      - .github/workflows/sliver-bof-e2e.yml
+      - portable/**
+      - scripts/build-matrix.sh
+      - scripts/build-target.sh
+      - scripts/generate-e2e-manifest.mjs
+      - scripts/generate-sliver-bof-e2e.mjs
+      - scripts/prepare-sliver-bof-e2e.sh
+      - scripts/verify-matrix.sh
+      - src/**
+      - testdata/e2e-manifest.json
+  pull_request:
+    branches: [bofs, master]
+    paths:
+      - .github/sliver-bof-e2e.json
+      - .github/workflows/sliver-bof-e2e.yml
+      - portable/**
+      - scripts/build-matrix.sh
+      - scripts/build-target.sh
+      - scripts/generate-e2e-manifest.mjs
+      - scripts/generate-sliver-bof-e2e.mjs
+      - scripts/prepare-sliver-bof-e2e.sh
+      - scripts/verify-matrix.sh
+      - src/**
+      - testdata/e2e-manifest.json
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sliver-bof-e2e-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: Execute portable and Windows BOFs through Sliver
+    uses: sliverarmory/sliver-test-bof/.github/workflows/e2e.yml@b38a09a226bf861a1e56e9dbe07838fe99138582
+    with:
+      manifest: .github/sliver-bof-e2e.json
+      prepare-command: ./scripts/prepare-sliver-bof-e2e.sh
