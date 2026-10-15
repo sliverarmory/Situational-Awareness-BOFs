@@ -69,6 +69,20 @@ that the selected `dist/<goos>/<goarch>` directory and E2E manifest contain the
 exact expected set (64 Windows objects or 25 Unix objects). Reflektor then
 runs its tagged corpus test with `go test -tags bof ./integration`.
 
+The `Sliver BOF End-to-End` workflow runs on the `bofs` branch and on pull
+requests targeting `bofs` or `master`. Its preparation step builds and verifies
+the complete 317-object matrix with checksum-verified Zig 0.14.0. The Sliver
+runtime manifest selects `dir`, `md5`, `sha256`, and `uptime` on all eight
+published targets, each in session and beacon mode. The 32 selected objects
+cover fixture paths, output assertions, Windows COFF, Linux ELF, and Darwin
+Mach-O through the Sliver BOF executor. The remaining objects retain build and
+manifest verification; they are not part of this Sliver E2E smoke
+run. Regenerate the Sliver manifest from the Reflektor contract with:
+
+```sh
+node scripts/generate-sliver-bof-e2e.mjs --write
+```
+
 ## POSIX mappings for Windows-oriented commands
 
 The following ports preserve the upstream packed argument shape but define a
